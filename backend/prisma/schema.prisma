@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Info {
+  id               Int     @id @default(autoincrement())
+  name             String?
+  role             String
+  city_based       String
+  country_based    String
+  email            String  @unique
+  bio              String
+  first_paragraph  String
+  second_paragraph String
+  third_paragraph  String
+  hero_image       String  @db.VarChar(255)
+  about_image      String  @db.VarChar(255)
+  stacks           Stack[] @relation("InfoToStack")
+}
+
+model Stack {
+  id          Int       @id @default(autoincrement())
+  name        String?
+  description String
+  logo        String    @db.VarChar(255)
+  info        Info[]    @relation("InfoToStack")
+  projects    Project[] @relation("ProjectToStack")
+}
+
+model Project {
+  id             Int           @id @default(autoincrement())
+  title          String
+  description    String
+  thumbnail      String?       @db.VarChar(255)
+  type           String        @default("automacao")
+  created_at     DateTime      @default(now())
+  posted_at      DateTime?
+  categoryId     Int?
+  github_link    String?       @db.VarChar(255)
+  live_demo_link String?       @db.VarChar(255)
+  is_featured    Boolean       @default(false)
+  is_published   Boolean       @default(false)
+  category       Category?     @relation(fields: [categoryId], references: [id])
+  contributors   Contributor[] @relation("ProjectToContributor")
+  stacks         Stack[]       @relation("ProjectToStack")
+}
+
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String
+  thumbnail   String?   @db.VarChar(255)
+  description String
+  created_at  DateTime  @default(now())
+  projects    Project[]
+}
+
+model Contributor {
+  id       Int       @id @default(autoincrement())
+  name     String
+  email    String
+  projects Project[] @relation("ProjectToContributor")
+}
+
+model Contact {
+  id        Int     @id @default(autoincrement())
+  contactId String
+  name      String?
+  email     String
+  subject   String
+  phone     String
+  message   String
+}
